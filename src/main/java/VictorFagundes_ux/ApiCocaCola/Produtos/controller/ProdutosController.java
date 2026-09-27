@@ -2,6 +2,7 @@ package VictorFagundes_ux.ApiCocaCola.Produtos.controller;
 
 import VictorFagundes_ux.ApiCocaCola.Produtos.model.Produtos;
 import VictorFagundes_ux.ApiCocaCola.Produtos.repository.ProdutosRepository;
+import VictorFagundes_ux.ApiCocaCola.Produtos.service.ProdutosService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,11 @@ import java.util.List;
 public class ProdutosController {
 
     private final ProdutosRepository repository;
+    private final ProdutosService service;
 
-    public ProdutosController(ProdutosRepository repository) {
+    public ProdutosController(ProdutosRepository repository, ProdutosService service) {
         this.repository = repository;
+        this.service = service;
     }
 
     @GetMapping
@@ -38,6 +41,12 @@ public class ProdutosController {
         return repository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/codigo/{codigo}")
+    public ResponseEntity<Produtos> buscarPorCodigo(@PathVariable String codigo) {
+        Produtos produto = service.buscarPorCodigo(codigo);
+        return ResponseEntity.ok(produto);
     }
 
     @PostMapping

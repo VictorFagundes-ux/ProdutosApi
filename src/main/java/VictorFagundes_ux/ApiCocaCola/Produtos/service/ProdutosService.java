@@ -1,5 +1,6 @@
 package VictorFagundes_ux.ApiCocaCola.Produtos.service;
 
+import VictorFagundes_ux.ApiCocaCola.Produtos.exception.ResourceNotFoundException;
 import VictorFagundes_ux.ApiCocaCola.Produtos.model.Produtos;
 import VictorFagundes_ux.ApiCocaCola.Produtos.repository.ProdutosRepository;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,12 @@ public class ProdutosService {
 
     public Produtos buscarPorId(Long id) {
         return repository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Produto não encontrado"
-                        )
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com o ID: " + id));
+    }
+
+    public Produtos buscarPorCodigo(String codigo) {
+        return repository.findByCodigo(codigo)
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com o código: " + codigo));
     }
 
     public Produtos salvar(Produtos produto) {
@@ -33,12 +35,13 @@ public class ProdutosService {
     }
 
     public void excluir(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Não foi possível excluir. Produto não encontrado com o ID: " + id);
+        }
         repository.deleteById(id);
     }
 
     public List<Produtos> buscarPorDescricao(String descricao) {
-        return repository
-                .findByDescricaoContainingIgnoreCase(descricao);
+        return repository.findByDescricaoContainingIgnoreCase(descricao);
     }
 }
-
